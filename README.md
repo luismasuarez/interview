@@ -1,5 +1,7 @@
 # Slack Stock Notifier
 
+[![tests](https://github.com/luismasuarez/interview/actions/workflows/tests.yml/badge.svg)](https://github.com/luismasuarez/interview/actions/workflows/tests.yml)
+
 Servicio de notificaciones automáticas para Slack que envía dos tipos de mensajes a un canal configurado:
 
 - **Resumen diario de compras** — cada mañana a la hora configurada, lista las compras del día anterior agrupadas por comprador.
