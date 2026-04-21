@@ -19,5 +19,8 @@ dev = [
     "pytest-mock==3.14.0",
 ]
 
+[tool.setuptools.packages.find]
+include = ["slack_notifier*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
