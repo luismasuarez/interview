@@ -1,50 +1,46 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- Sync Impact Report
+Version change: 0.0.0 → 1.0.0
+Added sections: All (initial ratification)
+Modified principles: N/A (initial)
+Templates requiring updates: ✅ No changes required (greenfield project)
+Follow-up TODOs: None
+-->
+
+# Slack Stock Notifier Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Reliability First (NON-NEGOTIABLE)
+Notifications MUST be delivered. Any failure to send a scheduled message or stock alert MUST be logged and retried. Silent failures are unacceptable. The system MUST surface errors visibly.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Simplicity Over Abstraction
+The MVP MUST use the minimum number of components necessary. No over-engineering. Each module has a single responsibility. Complexity MUST be justified by a concrete requirement.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Configuration-Driven Behavior
+All thresholds, schedules, Slack webhook URLs, and data source connections MUST be externalized to configuration. No hardcoded values in business logic.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Observability
+Every scheduled job execution MUST produce a log entry (success or failure). Alerts MUST include enough context (product name, current stock, threshold) for the recipient to act without additional lookups.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Test-First (NON-NEGOTIABLE)
+Unit tests MUST be written before implementation for all business logic (stock threshold evaluation, message formatting, summary aggregation). Integration tests MUST cover the Slack delivery path.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Development Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Language: Python 3.11+
+- Slack integration: Incoming Webhooks only (no OAuth/Bot Token for MVP)
+- Scheduler: APScheduler (no OS-level cron dependency)
+- Data source: SQLite for development, PostgreSQL-compatible queries for production
+- No UI for MVP
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Quality Gates
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- All business logic functions MUST have unit test coverage before merging
+- No PR merges with failing tests
+- Configuration schema MUST be validated at startup; invalid config MUST prevent startup with a clear error message
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other practices. Amendments require: (1) documented rationale, (2) version bump per semantic versioning, (3) update to this file. All implementation decisions MUST be traceable to a principle above.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-04-21 | **Last Amended**: 2026-04-21
