@@ -1,104 +1,78 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: Slack Stock Notifier
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
+**Branch**: `001-slack-stock-notifier` | **Date**: 2026-04-21 | **Spec**: [spec.md](spec.md)
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Build a Python service that queries a SQLite/PostgreSQL database for daily purchase data and product stock levels, then sends formatted Slack messages via Incoming Webhook: a daily summary grouped by buyer (scheduled at a configurable time) and periodic stock alerts when products fall below configured thresholds. APScheduler handles scheduling; all configuration is externalized to a `.env` / config file.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Python 3.11+  
+**Primary Dependencies**: `apscheduler`, `requests`, `python-dotenv`, `sqlalchemy` (query abstraction), `pytest`  
+**Storage**: SQLite (dev) — SQLAlchemy queries are PostgreSQL-compatible for production  
+**Testing**: pytest + pytest-mock  
+**Target Platform**: Linux server (runs as a long-lived process or via systemd)  
+**Project Type**: CLI service / background daemon  
+**Performance Goals**: Each job completes in under 10 seconds; Slack delivery under 5 seconds  
+**Constraints**: No UI, no OAuth, single Slack channel, read-only DB access  
+**Scale/Scope**: Single manager recipient, tens of products, hundreds of orders per day
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+| Principle | Status | Notes |
+|-----------|--------|-------|
+| I. Reliability First | ✅ | Retry logic on Slack delivery; all failures logged |
+| II. Simplicity | ✅ | 5 modules, no unnecessary abstractions |
+| III. Configuration-Driven | ✅ | All thresholds, schedule, webhook URL in config |
+| IV. Observability | ✅ | Structured logging on every job execution |
+| V. Test-First | ✅ | Unit tests for business logic before implementation |
 
-[Gates determined based on constitution file]
+No violations.
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+.specify/specs/001-slack-stock-notifier/
+├── plan.md
+├── research.md
+├── data-model.md
+├── quickstart.md
+├── contracts/
+│   └── slack-messages.md
+└── tasks.md
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+slack_notifier/
+├── config.py          # Load & validate config from env/file
+├── db.py              # SQLAlchemy queries (daily summary, stock levels)
+├── slack.py           # send_message(text) with retry
+├── jobs.py            # daily_summary_job(), stock_alert_job()
+└── scheduler.py       # APScheduler setup & entry point
 
 tests/
-├── contract/
-├── integration/
-└── unit/
+├── unit/
+│   ├── test_db.py
+│   ├── test_slack.py
+│   └── test_jobs.py
+└── integration/
+    └── test_scheduler.py
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+.env.example           # Template with all required config keys
+pyproject.toml         # Dependencies & project metadata
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Single flat package. No sub-packages needed at MVP scale.
 
-## Complexity Tracking
+## Phase 0: Research
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+See [research.md](research.md).
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+## Phase 1: Design Artifacts
+
+See [data-model.md](data-model.md), [contracts/slack-messages.md](contracts/slack-messages.md), [quickstart.md](quickstart.md).
