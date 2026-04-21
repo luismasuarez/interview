@@ -118,12 +118,46 @@ tests/
 ## Tests
 
 ```bash
-pytest                    # todos los tests
+pytest                    # todos los tests (17, 0 fallos)
 pytest tests/unit/        # solo unitarios
 pytest tests/integration/ # solo integración
 ```
 
-17 tests, 0 fallos.
+### Smoke test
+
+Demuestra el funcionamiento end-to-end sin necesidad de Slack ni base de datos externa. Levanta un webhook mock local, crea datos de prueba en memoria y verifica que ambos mensajes se generan con el formato correcto:
+
+```bash
+python3 smoke_test.py
+```
+
+Salida esperada:
+
+```
+============================================================
+SMOKE TEST — Slack Stock Notifier
+============================================================
+
+[1/2] daily_summary_job
+[2/2] stock_alert_job
+
+── Mensaje 1: Resumen diario ──────────────────────────────
+📊 *Resumen de compras del día - 20/04/2026*
+
+• Ana: Gadget x2, Widget x3
+• Carlos: Gadget x1
+
+Total: 6 unidades
+
+── Mensaje 2: Alerta de stock ─────────────────────────────
+⚠️ *Alerta de bajo stock*
+
+• Widget: 2 unidades (mínimo: 10)
+
+============================================================
+✅  SMOKE TEST PASSED — 2/2 mensajes verificados
+============================================================
+```
 
 ## Despliegue en producción
 
