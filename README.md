@@ -174,6 +174,13 @@ WantedBy=multi-user.target
 
 **Actualización de la imagen base** — La imagen usa un digest fijo. Cuando salgan parches de seguridad en Python, actualiza el digest en el `Dockerfile` y reconstruye.
 
+## Créditos
+
+Este proyecto fue diseñado e implementado con asistencia de:
+
+- **[Kiro CLI](https://kiro.dev)** — agente de IA que generó el código, los tests y la configuración Docker.
+- **[Spec Kit](https://github.com/github/spec-kit)** — toolkit de Spec-Driven Development usado para planificar el proyecto: constitución, especificaciones funcionales, plan técnico y breakdown de tareas antes de escribir una sola línea de código.
+
 ## Licencia
 
 MIT
