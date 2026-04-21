@@ -77,7 +77,8 @@ Todas las opciones se configuran en el archivo `.env` (nunca se almacenan en la 
 | `DAILY_SUMMARY_MINUTE` | Minuto del resumen diario | `0` |
 | `STOCK_CHECK_INTERVAL_MINUTES` | Cada cuántos minutos revisar el stock | `30` |
 
-El servicio falla al arrancar con un mensaje claro si falta alguna variable requerida.
+> [!IMPORTANT]
+> El servicio falla al arrancar con un mensaje claro si falta alguna variable requerida.
 
 ## Esquema de base de datos
 
@@ -100,7 +101,8 @@ CREATE TABLE orders (
 );
 ```
 
-Compatible con SQLite (desarrollo) y PostgreSQL (producción) — solo cambia `DATABASE_URL`.
+> [!TIP]
+> Compatible con SQLite (desarrollo) y PostgreSQL (producción) — solo cambia `DATABASE_URL`.
 
 ## Estructura del proyecto
 
@@ -203,17 +205,23 @@ WantedBy=multi-user.target
 
 ## Consideraciones operativas
 
-**Secretos** — El `SLACK_WEBHOOK_URL` es un secreto. Nunca lo incluyas en el repositorio ni en la imagen Docker. En producción usa un gestor de secretos (AWS Secrets Manager, Vault, Docker Secrets) e inyéctalo como variable de entorno en tiempo de ejecución.
+> [!WARNING]
+> El `SLACK_WEBHOOK_URL` es un secreto. Nunca lo incluyas en el repositorio ni en la imagen Docker. En producción usa un gestor de secretos (AWS Secrets Manager, Vault, Docker Secrets) e inyéctalo como variable de entorno en tiempo de ejecución.
 
-**Base de datos** — El servicio es de solo lectura. No necesita permisos de escritura. En PostgreSQL, crea un usuario con `GRANT SELECT` únicamente.
+> [!NOTE]
+> **Base de datos** — El servicio es de solo lectura. No necesita permisos de escritura. En PostgreSQL, crea un usuario con `GRANT SELECT` únicamente.
 
-**Zona horaria** — El scheduler usa la zona horaria del sistema. En Docker, pasa `TZ=America/New_York` (o la que corresponda) como variable de entorno para que el resumen diario se envíe a la hora correcta.
+> [!IMPORTANT]
+> **Zona horaria** — El scheduler usa la zona horaria del sistema. En Docker, pasa `TZ=America/New_York` (o la que corresponda) como variable de entorno para que el resumen diario se envíe a la hora correcta.
 
-**Reintentos** — Si Slack no responde, el servicio reintenta una vez tras 30 segundos. Si el segundo intento falla, registra el error y continúa — no detiene el scheduler.
+> [!TIP]
+> **Reintentos** — Si Slack no responde, el servicio reintenta una vez tras 30 segundos. Si el segundo intento falla, registra el error y continúa — no detiene el scheduler.
 
-**Monitoreo** — Todos los eventos se registran en stdout con timestamp. Integra con cualquier sistema de logs que consuma stdout (CloudWatch, Datadog, Loki, etc.). Busca `ERROR` en los logs para detectar fallos de entrega.
+> [!TIP]
+> **Monitoreo** — Todos los eventos se registran en stdout con timestamp. Integra con cualquier sistema de logs que consuma stdout (CloudWatch, Datadog, Loki, etc.). Busca `ERROR` en los logs para detectar fallos de entrega.
 
-**Actualización de la imagen base** — La imagen usa un digest fijo. Cuando salgan parches de seguridad en Python, actualiza el digest en el `Dockerfile` y reconstruye.
+> [!NOTE]
+> **Actualización de la imagen base** — La imagen usa un digest fijo. Cuando salgan parches de seguridad en Python, actualiza el digest en el `Dockerfile` y reconstruye.
 
 ## Créditos
 
