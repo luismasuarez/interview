@@ -125,10 +125,15 @@ pytest tests/integration/ # solo integración
 
 ### Smoke test
 
-Demuestra el funcionamiento end-to-end sin necesidad de Slack ni base de datos externa. Levanta un webhook mock local, crea datos de prueba en memoria y verifica que ambos mensajes se generan con el formato correcto:
+Demuestra el funcionamiento end-to-end sin necesidad de Slack ni base de datos externa. Levanta un webhook mock local, crea datos de prueba en memoria y verifica que ambos mensajes se generan con el formato correcto.
+
+**Desde un clone limpio:**
 
 ```bash
-python3 smoke_test.py
+git clone git@github.com:luismasuarez/interview.git
+cd interview
+uv venv .venv && uv pip install -e ".[dev]"
+.venv/bin/python smoke_test.py
 ```
 
 Salida esperada:
